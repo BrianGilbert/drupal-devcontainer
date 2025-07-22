@@ -1,0 +1,49 @@
+{
+  "name": "Core Drupal Development",
+  // Remove the direct image reference - we'll use docker-compose instead
+  // "image": "mcr.microsoft.com/devcontainers/php:1-8.3-apache-bookworm",
+  "features": {
+    // Node.js for front-end tooling
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "lts"
+    },
+    // Docker-in-Docker if you ever need to build images inside the container
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  // Run-time services
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "drupal",
+  "workspaceFolder": "/workspace",
+  // Forward the usual Apache port + Xdebug
+  "forwardPorts": [80, 3306],
+  "portsAttributes": {
+    "80": { "label": "HTTP" }
+  },
+  // Install Drupal CLI, Composer packages, and enable Xdebug
+  "postCreateCommand": "sudo chmod a+x \"$(pwd)\"/.devcontainer/post-create.sh && \"$(pwd)\"/.devcontainer/post-create.sh",
+  // VS Code extensions that make Drupal life easier
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "mblode.twig-language-2",
+        "bmewburn.vscode-intelephense-client",
+        "xdebug.php-debug",
+        "bradlc.vscode-tailwindcss"
+      ],
+      "settings": {
+        "php.validate.executablePath": "/usr/local/bin/php"
+      }
+    }
+  },
+  // Use host UID/GID so file permissions stay friendly
+  "remoteUser": "vscode",
+  "updateRemoteUserUID": true,
+  "mounts": [
+    "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached"
+  ],
+  // XDebug configuration for debugging PHP applications
+  "remoteEnv": {
+    "XDEBUG_CONFIG": "client_host=host.docker.internal client_port=9003",
+    "XDEBUG_MODE": "debug,develop"
+  }
+}
